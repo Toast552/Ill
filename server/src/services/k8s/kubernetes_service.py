@@ -113,6 +113,7 @@ class KubernetesSandboxService(SandboxService):
                 k8s_config=self.app_config.kubernetes,
                 agent_sandbox_config=self.app_config.agent_sandbox,
                 ingress_config=self.ingress_config,
+                app_config=self.app_config,
             )
             logger.info(
                 f"Initialized workload provider: {self.workload_provider.__class__.__name__}"

@@ -427,6 +427,8 @@ class AppConfig(BaseModel):
                 raise ValueError("agent_sandbox block must be omitted when runtime.type = 'docker'.")
             if self.ingress is not None and self.ingress.mode != INGRESS_MODE_DIRECT:
                 raise ValueError("ingress.mode must be 'direct' when runtime.type = 'docker'.")
+            if self.secure_runtime is not None and self.secure_runtime.type == "firecracker":
+                raise ValueError( "secure_runtime.type 'firecracker' is only compatible with runtime.type='kubernetes'.")
         elif self.runtime.type == "kubernetes":
             if self.kubernetes is None:
                 self.kubernetes = KubernetesRuntimeConfig()

@@ -559,3 +559,38 @@ def test_load_config_with_secure_runtime(tmp_path, monkeypatch):
     assert loaded.secure_runtime.type == "gvisor"
     assert loaded.secure_runtime.docker_runtime == "runsc"
     assert loaded.secure_runtime.k8s_runtime_class == "gvisor"
+
+
+def test_docker_runtime_with_firecracker_raises_error():
+    """Docker runtime with Firecracker secure runtime should raise error.
+
+    Firecracker (kata-fc) is only available as a Kubernetes RuntimeClass,
+    not as a Docker OCI runtime. This test prevents the silent fallback
+    to runc which would bypass the intended microVM isolation.
+    """
+    with pytest.raises(ValueError) as exc:
+        AppConfig(
+            runtime={"type": "docker", "execd_image": "execd:v1"},
+            secure_runtime={
+                "type": "firecracker",
+                "k8s_runtime_class": "kata-fc",
+            },
+        )
+    assert "firecracker" in str(exc.value).lower()
+    assert "kubernetes" in str(exc.value).lower()
+
+
+def test_kubernetes_runtime_with_firecracker_is_valid():
+    """Kubernetes runtime with Firecracker should be valid."""
+    cfg = AppConfig(
+        runtime={"type": "kubernetes", "execd_image": "execd:v1"},
+        kubernetes={"namespace": "default"},
+        secure_runtime={
+            "type": "firecracker",
+            "k8s_runtime_class": "kata-fc",
+        },
+    )
+    assert cfg.runtime.type == "kubernetes"
+    assert cfg.secure_runtime is not None
+    assert cfg.secure_runtime.type == "firecracker"
+    assert cfg.secure_runtime.k8s_runtime_class == "kata-fc"
