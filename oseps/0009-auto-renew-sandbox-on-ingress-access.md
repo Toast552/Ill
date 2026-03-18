@@ -1,9 +1,9 @@
 ---
 title: Auto-Renew Sandbox on Ingress Access
 authors:
-  - "@pjp"
+  - "@Pangjiping"
 creation-date: 2026-03-15
-last-updated: 2026-03-15
+last-updated: 2026-03-18
 status: implementing
 ---
 
